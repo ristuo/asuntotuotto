@@ -140,5 +140,5 @@ asunto <- function( hinta = 175000
     asuntorahat <- (1 + arvonnousu) * hinta - 
                    ( sum(res$kokonaiskustannus) + maksuosuus ) + 
                    vuokra * (laina_aika * 12)
-    c( osake = osakerahat, asunto = asuntorahat )
+    list( osake = osakerahat, asunto = asuntorahat )
 }
