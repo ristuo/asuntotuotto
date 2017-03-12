@@ -99,19 +99,6 @@ tasalyhennys <- function( hinta
     res
 }
 
-x <- tasalyhennys( 175000                       
-                 , 20000
-                 , 20
-                 , 0.01
-                 , 0.0135 )
-                        
-y <- annuiteetti( 175000                       
-                 , 20000
-                 , 20
-                 , 0.01
-                 , 0.0135 )
- 
-
 asunto <- function( hinta = 175000
                   , maksuosuus = 20000
                   , laina_aika = 20
@@ -120,6 +107,9 @@ asunto <- function( hinta = 175000
                   , marginaali = 0.0135
                   , verovahennys = 0.25
                   , alijaamahyvitys = 0.3
+                  , osaketuotto = 0.03
+                  , arvonnousu = 0
+                  , vuokra = 750
                   , menetelma = "annuiteetti" )
 {
     f <- switch( menetelma
@@ -141,28 +131,14 @@ asunto <- function( hinta = 175000
             , marginaali )
     res$korkovahennys <- res$maksettava_korko * verovahennys * alijaamahyvitys
     res$vastike <- hoitovastike
-    res
-}
-
-asuntotuotto <- function( hinta
-                        , maksuosuus
-                        , laina_aika
-                        , hoitovastike
-                        , euribor
-                        , marginaali
-                        , verovahennys
-                        , alijaamahyvitys
-                        , menetelma = "annuiteetti" )
-{
-    maksuaikataulu <- asunto( hinta
-                            , maksuosuus
-                            , laina_aika
-                            , hoitovastike
-                            , euribor
-                            , marginaali
-                            , verovahennys
-                            , alijaamahyvitys
-                            , annuiteetti )
-   with( maksuaikataulu  
-       , { sum( maksu + vastike - korkovahennys )})
+    res$kokonaiskustannus <- res$vastike + res$maksu - res$korkovahennys 
+      
+    osaketuotto_kk <- osaketuotto/12
+    korot <- (1 + osaketuotto_kk ) ^ ((laina_aika*12):1)
+    osakerahat <- sum(( res$kokonaiskustannus - vuokra ) * korot) + 
+                  maksuosuus * ( (1 + osaketuotto_kk) ^ (laina_aika*12) )
+    asuntorahat <- (1 + arvonnousu) * hinta - 
+                   ( sum(res$kokonaiskustannus) + maksuosuus ) + 
+                   vuokra * (laina_aika * 12)
+    c( osake = osakerahat, asunto = asuntorahat )
 }
