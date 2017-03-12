@@ -140,5 +140,33 @@ asunto <- function( hinta = 175000
     asuntorahat <- (1 + arvonnousu) * hinta - 
                    ( sum(res$kokonaiskustannus) + maksuosuus ) + 
                    vuokra * (laina_aika * 12)
-    list( osake = osakerahat, asunto = asuntorahat )
+    list( osake = osakerahat, asunto = asuntorahat, asunto_df = res )
+}
+
+plot_kk_maksut <- function(asunto_df)
+{
+    maksimi <- max(asunto_df$kokonaiskustannus) + 1
+    tmp <- select( asunto_df
+                 , kuukausi
+                 , maksettava_paaoma
+                 , maksettava_korko
+                 , vastike ) %>%
+           melt(id.vars = "kuukausi")
+    ggplot(data = tmp, aes(y = value, fill = variable, x = kuukausi)) +
+    geom_bar(stat="identity", width=1) + 
+    theme_bw() +
+    scale_fill_manual( labels = c("Korko", "Velan pääoma", "Hoitovastike")
+                      , values = c( "#b3e2cd"
+                                  , "#fdcdac"
+                                  , "#cbd5e8" )) +
+    ylab("Euroa") +
+    xlab("Kuukausi") +
+    ggtitle("Kuukausikustannuksen jakautuminen") +
+    theme( panel.grid = element_blank()
+         , legend.title = element_blank()
+         , legend.position = "bottom"
+         , plot.title = element_text(hjust = 0.5)
+         , axis.ticks = element_blank()
+         , panel.border = element_blank() ) +
+    scale_y_continuous( breaks = c(seq(0, maksimi, by = 100), round(maksimi)))
 }

@@ -86,5 +86,6 @@ fluidPage( titlePanel("Asuntotuottolaskuri")
                                       , arvonnousu_slider
                                       , vuokra_slider
                                       , menetelma_radio )
-                        , mainPanel( textOutput("text")))) %>% 
+                        , mainPanel( textOutput("text")
+                                   , plotOutput("kustannusplot")))) %>% 
 shinyUI

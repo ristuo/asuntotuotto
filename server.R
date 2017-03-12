@@ -1,10 +1,8 @@
 library(shiny)
 source("asunto.R")
 
-
-# Define server logic required to draw a histogram
-shinyServer(function(input, output) {
-  output$text <- renderText({
+input_to_asunto <- function(input)
+{
     menetelma <- switch( input$menetelma
                        , Tasaerä = "tasalyhennys"
                        , Annuiteetti = "annuiteetti" )
@@ -20,8 +18,19 @@ shinyServer(function(input, output) {
                  , arvonnousu = input$arvonnousu
                  , vuokra = input$vuokra
                  , menetelma = menetelma )
+    res
+}
+
+shinyServer(function(input, output) {
+
+  output$text <- renderText({
+    res <- input_to_asunto(input)
     paste0("Osaketuotto: ", round(res$osake,0), ", asuntotuotto: ", round(res$asunto,0))
   })
+  output$kustannusplot <- renderPlot({
+        res <- input_to_asunto(input)
+        print(plot_kk_maksut( res$asunto_df ))
+    })
 })
 
 
